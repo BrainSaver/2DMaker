@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlayerMove : MonoBehaviour
 {
     public float maxSpeed;
+    public float jumpPower;
     Rigidbody2D rigid;
     SpriteRenderer spriteRenderer;
     Animator anim;
@@ -17,6 +18,12 @@ public class PlayerMove : MonoBehaviour
     }
 
     void Update(){
+        //Jump
+        if(Input.GetButtonUp("Jump") && !anim.GetBool("isJumping")){//점프가 아닌 경우에만 동작
+            rigid.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
+            anim.SetBool("isJumping", true);
+        }
+
         //Stop Speed
         if(Input.GetButtonUp("Horizontal")){
             rigid.velocity = new Vector2(0, rigid.velocity.y);
@@ -28,8 +35,7 @@ public class PlayerMove : MonoBehaviour
             spriteRenderer.flipX = h == -1;
         }
 
-        //Animation
-        //Mathf.Abs : 절대값
+        //Animation Mathf.Abs : 절대값
         if(Mathf.Abs(rigid.velocity.x) < 0.3 ){
             anim.SetBool("isWalking", false);
         }
@@ -51,6 +57,18 @@ public class PlayerMove : MonoBehaviour
         else if(rigid.velocity.x < maxSpeed * (-1)){
             rigid.velocity = new Vector2(maxSpeed * (-1), rigid.velocity.y);//왼쪽에 대한 것
         }
+
+        //Landing Platform 바닥으로 레이저를 쏨. 레이저를 쏘면 레이저에 닿은 물체의 정보를 받아옴
+        if(rigid.velocity.y < 0){
+            Debug.DrawRay(rigid.position, Vector3.down, new Color(0, 1, 0));
+            RaycastHit2D rayHit = Physics2D.Raycast(rigid.position, Vector3.down, 1, LayerMask.GetMask("Platform"));
+            
+                if(rayHit.collider != null){
+                    if(rayHit.distance < 0.55f)
+                        anim.SetBool("isJumping", false);
+                }
+        }
+
     }
 }
 
