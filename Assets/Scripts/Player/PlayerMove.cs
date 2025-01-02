@@ -70,5 +70,31 @@ public class PlayerMove : MonoBehaviour
         }
 
     }
-}
 
+    //충돌체크 (대문자 주의)
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        if(collision.gameObject.tag == "Enemy"){
+            //Debug.Log("플레이어가 맞았습니다!");
+            OnDamaged(collision.transform.position);
+        }
+    }
+
+    void OnDamaged(Vector2 targetPos){
+        gameObject.layer = 8;//무적모드로로
+        spriteRenderer.color = new Color(1, 1, 1, 0.4f);//투명도
+
+        //Reaction Force
+        int dirc = transform.position.x-targetPos.x > 0 ? 1 : -1;
+        rigid.AddForce(new Vector2(dirc, 1) * 7, ForceMode2D.Impulse);
+
+        anim.SetTrigger("doDamaged");
+        Invoke("OffDamaged", 3);//3초뒤에 실행
+    }
+    
+    void OffDamaged(){
+        gameObject.layer = 7;//무적모드 해제
+        spriteRenderer.color = new Color(1, 1, 1, 1);//투명도
+    }
+
+}
