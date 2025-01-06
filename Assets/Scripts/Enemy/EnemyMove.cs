@@ -7,13 +7,15 @@ public class EnemyMove : MonoBehaviour
     Animator anim;
     Rigidbody2D rigid;
     SpriteRenderer spriteRenderer;
-    
+    CapsuleCollider2D capsulecollider;
+
     public int nextMove;
     void Awake()
     {
         rigid = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        capsulecollider = GetComponent<CapsuleCollider2D>();
 
         Invoke("Think", 5);//5초 후에 Think 함수를 실행
     }
@@ -21,7 +23,7 @@ public class EnemyMove : MonoBehaviour
     void FixedUpdate()
     {
         //Move
-        rigid.velocity = new Vector2(nextMove, rigid.velocity.y);
+        rigid.linearVelocity = new Vector2(nextMove, rigid.linearVelocity.y);
 
 
             //Platform Check
@@ -56,5 +58,34 @@ public class EnemyMove : MonoBehaviour
 
         CancelInvoke();//Invoke 함수를 멈춤
         Invoke("Think", 2);
+    }
+
+    void OnAttack(Transform enemy){
+    //Point
+
+    //Enemy Die
+    EnemyMove enemyMove = enemy.GetComponent<EnemyMove>();
+    enemyMove.OnDamaged();
+    }
+
+    public void OnDamaged(){
+    //Sprite Alpha
+    spriteRenderer.color = new Color(1, 1, 1, 0.4f);
+
+    //Sprite Flip Y
+    spriteRenderer.flipY = true;
+
+    //Collider Disable
+    capsulecollider.enabled = false;
+
+    //Die Effect Jump
+    rigid.AddForce(Vector2.up * 5, ForceMode2D.Impulse);
+
+    //Destroy
+    Invoke("DeActive", 5);
+    }
+
+    void DeActive(){
+        gameObject.SetActive(false);
     }
 }
