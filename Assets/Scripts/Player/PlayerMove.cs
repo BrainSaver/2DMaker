@@ -159,4 +159,8 @@ public class PlayerMove : MonoBehaviour
     rigid.AddForce(Vector2.up * 5, ForceMode2D.Impulse);
     }
 
+    public void VelocityZero(){
+        rigid.linearVelocity = Vector2.zero;
+    }
+
 }
